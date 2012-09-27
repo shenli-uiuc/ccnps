@@ -17,16 +17,15 @@ import org.ccnx.ccn.protocol.Interest;
 import org.ccnx.ccn.protocol.ContentObject;
 import org.ccnx.ccn.protocol.MalformedContentNameStringException;
 
+import java.io.IOException;
 
 public class PostThread extends Thread{
-
-    private static final ONEDAY = 1000 * 60 * 60 * 24;
 
     private String _name = null;
     private String _msg = null;
     private CCNHandle _handle = null;
 
-    public SubscribeThread(Stirng name, String msg, CCNHandle handle){
+    public PostThread(String name, String msg, CCNHandle handle){
         this._name = name;
         this._msg = msg;
         this._handle = handle;
@@ -41,9 +40,9 @@ public class PostThread extends Thread{
         try{
             ContentName contentName = ContentName.fromURI(Protocol.POST_PREFIX + _name + "/" + _msg);
             Interest interest = new Interest(contentName);
-            System.out.println("**************" + contentName.toURIString() + "\n" + "***************" + _strPrefix + ", " + request);
+            System.out.println("**************" + contentName.toURIString());
             CCNReader reader = new CCNReader(_handle);
-            ContentObject co = reader.get(interest, ONEDAY);
+            ContentObject co = reader.get(interest, Protocol.ONEDAY);
             String ans = new String(co.content());
             System.out.println("In Post - Got data : " + ans);
             return ans;

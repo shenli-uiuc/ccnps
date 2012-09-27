@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<project name = "ccnps" default="all" basedir="../">
+    <path id="libs">
+        <fileset dir="lib/">
+            <include name="*.jar"/>
+        </fileset>
+    </path>
+
+    <target name = "clean">
+        <delete dir="build/"/>
+        <mkdir dir="build/"/>
+    </target>
+    
+    <target name = "ccnps_util" depends = "clean">
+        <javac srcdir="src/util/" destdir="build/" classpathref="libs" includeantruntime="false"/>
+    </target>
+
+    <target name = "ccnps_protocol" depends = "ccnps_util">
+        <javac srcdir="src/protocol" destdir="build/" classpathref="libs" includeantruntime="false"/>
+    </target>
+
+    <target name = "ccnps_pub" depends = "ccnps_util, ccnps_protocol">
+        <javac srcdir="src/pub" destdir="build/" classpathref="libs" includeantruntime="false"/>
+    </target>
+
+    <target name = "ccnps_sub" depends = "ccnps_util, ccnps_protocol">
+        <javac srcdir="src/sub" destdir="build/" classpathref="libs" includeantruntime="false"/>
+    </target>
+
+    <target name = "ccnps_test" depends = "ccnps_sub, ccnps_pub, ccnps_util">
+        <javac srcdir="src/test" destdir="build/" classpathref="libs" includeantruntime="false"/>
+    </target>
+
+    <target name = "all" depends="clean, ccnps_util, ccnps_protocol, ccnps_pub, ccnps_sub, ccnps_test">
+    </target>
+
+    
+</project>

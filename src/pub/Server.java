@@ -1,6 +1,7 @@
-package hermes.server;
+package ccnps.pub;
 
-import hermes.util.*;
+import ccnps.util.*;
+import ccnps.protocol.*;
 
 import java.util.*;
 import java.lang.*;
@@ -38,30 +39,46 @@ public class Server implements CCNFilterListener{
     private Interest _interest = null;
     private CCNHandle _handle = null;
     private Publisher _pub = null;
-   
- 
-    public CCNDataWriterReg() throws MalformedContentNameStringException, ConfigurationException, IOException {
-        _prefix = ContentName.fromURI(_strPrefix);
-        _handle = CCNHandle.open();
-        _pub = new Publisher(_handle);
+    private CCNWriter _writer = null;
+
+    public Server(){
+        try{
+            _handle = CCNHandle.open();
+            _pub = new Publisher(CCNHandle.open());
+            _writer = new CCNWriter(_handle);
+        }
+        catch(ConfigurationException ex){
+            ex.printStackTrace();
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
     }
 
 
-    public void start() throws IOException{
+    public void start(){
         // All we have to do is say that we're listening on our main prefix.
-        _handle.registerFilter(Protocol.POST_PREFIX, this);
+        try{
+            _handle.registerFilter(ContentName.fromURI(Protocol.POST_PREFIX), this);
+        }
+        catch(MalformedContentNameStringException ex){
+            ex.printStackTrace();
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
     }
 
     private MsgItem getMsgItem(Interest interest){
-        String strMsg = interest.name().toURIString().subString(Protocol.POST_PREFIX.length);
-        int splitIndex = strMsg.indexof("/");
-        String usr = strMsg.subString(0, splitIndex);
-        String msg = strMsg.subString(splitIndex + 1, strMsg.length);
-        String strPub = Protocol.PUB_PREFIX + user;
+        String strMsg = interest.name().toURIString().substring(Protocol.POST_PREFIX.length());
+        int splitIndex = strMsg.indexOf("/");
+        String usr = strMsg.substring(0, splitIndex);
+        String msg = strMsg.substring(splitIndex + 1, strMsg.length());
+        String strPub = Protocol.PUB_PREFIX + usr;
         return new MsgItem(strPub, msg);
     }
-   
-     
+
+
 
     public boolean handleInterest(Interest interest) {
         System.out.println("===========================received Interest : " + interest.name().toURIString() + "\n");
@@ -73,15 +90,28 @@ public class Server implements CCNFilterListener{
         else if (MetadataProfile.isHeader(interest.name())) {
             System.out.println("Got an interest for the first segment of the header, ignoring : " + interest.name().toURIString());
             return false;
-        
+        }     
+
         MsgItem msgItem = getMsgItem(interest);
-    
-        if(null != msgItem)
-            _pub.publish(interest.getContentName.toURIString(), Protocol.SUCCESS);
-        else
-            _pub.publish(interest.getContentName.toURIString(), Protocol.ERROR);
+        try{
+            _writer.addOutstandingInterest(interest);
+            if(null != msgItem)
+                _writer.put(interest.name(), Protocol.SUCCESS, 1);
+            else
+                _writer.put(interest.name(), Protocol.ERROR, 1);
+        }
+        catch(SignatureException ex){
+            ex.printStackTrace();
+        }
+        catch(MalformedContentNameStringException ex){
+            ex.printStackTrace();
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
         //split string
-        _pub.publish(msgItem.getPublisher, msgItem.getMsg);
+        System.out.println("getPublisher result: " + msgItem.getPublisher());
+        _pub.publish(msgItem.getPublisher(), msgItem.getMsg());
         return true;
     }
 
@@ -91,8 +121,13 @@ public class Server implements CCNFilterListener{
      */
     public void shutdown() throws IOException {
         if (null != _handle) {
-            _handle.unregisterFilter(Protocol.POST_PREFIX, this);
-            System.out.println("CCNQueryListener Closed!\n");
+            try{
+                _handle.unregisterFilter(ContentName.fromURI(Protocol.POST_PREFIX), this);
+                System.out.println("CCNQueryListener Closed!\n");
+            }
+            catch(MalformedContentNameStringException ex){
+                ex.printStackTrace();
+            }
         }
     }
 

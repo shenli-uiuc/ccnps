@@ -1,3 +1,7 @@
+package ccnps.pub;
+
+import ccnps.protocol.*;
+import ccnps.util.*;
 
 import java.util.*;
 import java.lang.*;
@@ -32,21 +36,33 @@ import org.ccnx.ccn.protocol.MalformedContentNameStringException;
 
 public class Publisher{
     private static final Integer CONTENT_LIFE_TIME = 1000; //ms
-    
+
     private CCNHandle _handle = null;
     private CCNWriter _writer = null;
 
     public Publisher(CCNHandle handle){
         this._handle = handle;
-        this._writer = new CCNWriter(handle);
+        try{
+            this._writer = new CCNWriter(handle);
+        }
+        catch(IOException ex){
+            System.out.println("CCNWriter construction: " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
-    
-    private boolean publish(String prefix, String msg){
+
+    public boolean publish(String prefix, String msg){
 
         try{
-            _writer.put(prefix, msg.getBytes());
+            //Interest interest = new Interest(prefix);
+            //_writer.addOutstandingInterest(interest);
+            _writer.put(ContentName.fromURI(prefix), msg, Protocol.MSG_TTL);
         }
         catch(SignatureException ex){
+            ex.printStackTrace();
+            return false;
+        }
+        catch(MalformedContentNameStringException ex){
             ex.printStackTrace();
             return false;
         }
@@ -59,8 +75,14 @@ public class Publisher{
     }
 
     public static void main(String args[]){
-        Publisher publisher = new Publisher(CCNHandle.open());
-        publisher.publish("/ccnps/test/Alice", "Alice's new tweet");
+        try{
+            Publisher publisher = new Publisher(CCNHandle.open());
+            publisher.publish(Protocol.PUB_PREFIX + "Alice", "Alice's new tweet");
+        }
+        catch(Exception ex){
+            System.out.println("Exception in Publisher.main : " + ex.getMessage());
+            ex.printStackTrace();
+        }
     }
 
 }

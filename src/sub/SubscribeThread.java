@@ -17,28 +17,47 @@ import org.ccnx.ccn.protocol.Interest;
 import org.ccnx.ccn.protocol.ContentObject;
 import org.ccnx.ccn.protocol.MalformedContentNameStringException;
 
+import java.util.concurrent.*;
+import java.io.IOException;
 
-public class SubsribeThread extends Thread{
-
-    private static final ONEDAY = 1000 * 60 * 60 * 24;
+public class SubscribeThread extends Thread{
 
     private String _name = null;
     private CCNHandle _handle = null;
     private LinkedBlockingQueue _lbq = null;
     private CCNReader _reader = null;
 
-    public SubscribeThread(Stirng name, CCNHandle handle, LinkedBlockingQueue lbq){
+    public SubscribeThread(String name, CCNHandle handle, LinkedBlockingQueue lbq){
         this._name = name;
         this._handle = handle;
         this._lbq = lbq;
-        this._reader = new CCNReader(handle);
+        try{
+            this._reader = new CCNReader(handle);
+        }
+        catch(ConfigurationException ex){
+            ex.printStackTrace();
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
     }
-    
+
     public void run(){
         String curMsg = null;
         while(true){
             curMsg = receive();
-            lbq.put(new MsgItem(_name, curMsg));
+            try{
+                _lbq.put(new MsgItem(_name, curMsg));
+            }
+            catch(InterruptedException ex){
+                ex.printStackTrace();
+            }
+            try{
+                Thread.sleep(1000);
+            }
+            catch(Exception ex){
+                ex.printStackTrace();
+            }
         }
     }
 
@@ -46,15 +65,11 @@ public class SubsribeThread extends Thread{
         try{
             ContentName contentName = ContentName.fromURI(Protocol.PUB_PREFIX + _name);
             Interest interest = new Interest(contentName);
-            System.out.println("**************" + contentName.toURIString() + "\n" + "***************" + _strPrefix + ", " + request);
-            ContentObject co = _reader.get(interest, ONEDAY);
+            System.out.println("**************" + contentName.toURIString());
+            ContentObject co = _reader.get(interest, Protocol.ONEDAY);
             String ans = new String(co.content());
             System.out.println("Got data : " + ans);
             return ans;
-        }
-        catch (ConfigurationException e) {
-            System.out.println("ConfigurationException in CCNQuerySender-sendQuery: " + e.getMessage());
-            e.printStackTrace();
         }
         catch (IOException e) {
             System.out.println("IOException in CCNQuerySender-sendQuery: " + e.getMessage());

@@ -35,7 +35,7 @@ public class Subscriber {
     private String _name = null;
     private HashSet<String> _subSet = null;
     private LinkedBlockingQueue<MsgItem> _lbq = null;
-    private ArrayList<SubscribeThread> _threads = null;
+    private ArrayList<SubscribeThread> _threadList = null;
 
     public Subscriber(String name, CCNHandle handle){
         this._handle = handle;
@@ -59,7 +59,15 @@ public class Subscriber {
 
     //this should be blocking
     public MsgItem receive(){
-        return _lbq.take();
+        MsgItem msgItem = null;
+        try{
+            msgItem = _lbq.take();
+        }
+        catch(InterruptedException ex){
+            ex.printStackTrace();
+
+        }
+        return msgItem;
     }
 
     //this is non-blocking, post is done by a separate thread
@@ -68,15 +76,23 @@ public class Subscriber {
         pt.start();
     }
 
-    
+
 
     public static void main(String argv[]){
-        Subscriber subscriber = new Subscriber("Bob", CCNHandle.open());
-        subscriber.subscribe("Alice");
-        while(true){
-            System.out.println(subscriber.receive().getMsg());
+        try{
+            Subscriber subscriber = new Subscriber("Bob", CCNHandle.open());
+            subscriber.subscribe("Alice");
+            while(true){
+                System.out.println(subscriber.receive().getMsg());
+            }
+        }
+        catch(ConfigurationException ex){
+            ex.printStackTrace();
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
         }
     }
-        
-    
+
+
 }
