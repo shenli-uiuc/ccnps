@@ -89,6 +89,7 @@ public class HSSubscriber {
     //this should be blocking
     public String receive(){
         try{
+            Thread.sleep(1000);
             while(true){
                 ContentName contentName = ContentName.fromURI(Protocol.HEAVY_PUB_PREFIX + _name);
                 Interest interest = new Interest(contentName);
@@ -105,13 +106,16 @@ public class HSSubscriber {
         catch(IOException ex){
             ex.printStackTrace();
         }
+        catch(InterruptedException ex){
+            ex.printStackTrace();
+        }
         return null;
     }
 
 
     //this is non-blocking, post is done by a separate thread
     public void post(String msg){
-        PostThread pt = new PostThread(_name, msg, _handle);
+        PostThread pt = new PostThread(Protocol.HEAVY_POST_PREFIX + _name, msg, _handle);
         pt.start();
     }
 

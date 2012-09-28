@@ -79,6 +79,9 @@ public class SubscribeThread extends Thread{
             System.out.println("**************" + contentName.toURIString());
             //every receive waits for only 5 seconds, cause we gonna need to stop this thread in the middle of execution
             ContentObject co = _reader.get(interest, 5000);
+            if(null == co){
+                return null;
+            }
             String ans = new String(co.content());
             System.out.println("Got data : " + ans);
             return ans;

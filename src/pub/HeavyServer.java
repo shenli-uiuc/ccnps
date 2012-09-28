@@ -74,10 +74,13 @@ public class HeavyServer implements CCNFilterListener{
         }
     }
 
-    private String enrollSub(String publisher, String subscriber){
+    private synchronized String enrollSub(String publisher, String subscriber){
         HashSet<String> subSet = _pubSet.get(publisher);
         if(null == subSet){
-            return Protocol.PUB_NOT_EXIST;
+            subSet = new HashSet<String> ();
+            subSet.add(subscriber);
+            _pubSet.put(publisher, subSet);
+            return Protocol.SUCCESS;
         }
         else if(subSet.contains(subscriber)){
             return Protocol.SUB_ALREADY;

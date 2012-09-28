@@ -31,7 +31,11 @@
         <javac srcdir="src/test" destdir="build/" classpathref="libs" includeantruntime="false"/>
     </target>
 
-    <target name = "all" depends="clean, ccnps_util, ccnps_protocol, ccnps_pub, ccnps_sub, ccnps_test">
+    <target name = "ccnps_gui" depends = "ccnps_sub, ccnps_pub, ccnps_test">
+        <javac srcdir="src/gui" destdir="build/" classpathref="libs" includeantruntime="false"/>
+    </target>
+
+    <target name = "all" depends="clean, ccnps_util, ccnps_protocol, ccnps_pub, ccnps_sub, ccnps_test, ccnps_gui">
     </target>
 
     

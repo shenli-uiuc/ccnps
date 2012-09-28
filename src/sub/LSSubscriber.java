@@ -1,6 +1,7 @@
 package ccnps.sub;
 
 import ccnps.util.*;
+import ccnps.protocol.*;
 
 import java.util.*;
 import java.sql.Timestamp;
@@ -73,7 +74,7 @@ public class LSSubscriber {
 
     //this is non-blocking, post is done by a separate thread
     public void post(String msg){
-        PostThread pt = new PostThread(_name, msg, _handle);
+        PostThread pt = new PostThread(Protocol.LIGHT_POST_PREFIX + _name, msg, _handle);
         pt.start();
     }
 
