@@ -26,6 +26,7 @@ public class SubscribeThread extends Thread{
     private CCNHandle _handle = null;
     private LinkedBlockingQueue _lbq = null;
     private CCNReader _reader = null;
+    private boolean _isRunning = false;
 
     public SubscribeThread(String name, CCNHandle handle, LinkedBlockingQueue lbq){
         this._name = name;
@@ -42,10 +43,18 @@ public class SubscribeThread extends Thread{
         }
     }
 
+    public void stopAllSub(){
+        _isRunning = false;
+    }
+
     public void run(){
         String curMsg = null;
-        while(true){
+        _isRunning = true;
+        while(_isRunning){
             curMsg = receive();
+            if(null == curMsg){
+                continue;
+            }
             try{
                 _lbq.put(new MsgItem(_name, curMsg));
             }
@@ -61,12 +70,15 @@ public class SubscribeThread extends Thread{
         }
     }
 
-    public String receive(){
+    
+
+    private String receive(){
         try{
-            ContentName contentName = ContentName.fromURI(Protocol.PUB_PREFIX + _name);
+            ContentName contentName = ContentName.fromURI(Protocol.LIGHT_PUB_PREFIX + _name);
             Interest interest = new Interest(contentName);
             System.out.println("**************" + contentName.toURIString());
-            ContentObject co = _reader.get(interest, Protocol.ONEDAY);
+            //every receive waits for only 5 seconds, cause we gonna need to stop this thread in the middle of execution
+            ContentObject co = _reader.get(interest, 5000);
             String ans = new String(co.content());
             System.out.println("Got data : " + ans);
             return ans;

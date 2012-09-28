@@ -77,7 +77,7 @@ public class Publisher{
     public static void main(String args[]){
         try{
             Publisher publisher = new Publisher(CCNHandle.open());
-            publisher.publish(Protocol.PUB_PREFIX + "Alice", "Alice's new tweet");
+            publisher.publish(Protocol.LIGHT_PUB_PREFIX + "Alice", "Alice's new tweet");
         }
         catch(Exception ex){
             System.out.println("Exception in Publisher.main : " + ex.getMessage());

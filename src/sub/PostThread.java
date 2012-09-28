@@ -38,7 +38,7 @@ public class PostThread extends Thread{
     //encode the message into the interest
     public String post(){
         try{
-            ContentName contentName = ContentName.fromURI(Protocol.POST_PREFIX + _name + "/" + _msg);
+            ContentName contentName = ContentName.fromURI(Protocol.LIGHT_POST_PREFIX + _name + "/" + _msg);
             Interest interest = new Interest(contentName);
             System.out.println("**************" + contentName.toURIString());
             CCNReader reader = new CCNReader(_handle);

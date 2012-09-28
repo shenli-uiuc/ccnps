@@ -34,14 +34,14 @@ import org.ccnx.ccn.protocol.ExcludeComponent;
 import org.ccnx.ccn.protocol.Interest;
 import org.ccnx.ccn.protocol.MalformedContentNameStringException;
 
-public class Server implements CCNFilterListener{
+public class LightServer implements CCNFilterListener{
     
     private Interest _interest = null;
     private CCNHandle _handle = null;
     private Publisher _pub = null;
     private CCNWriter _writer = null;
 
-    public Server(){
+    public LightServer(){
         try{
             _handle = CCNHandle.open();
             _pub = new Publisher(CCNHandle.open());
@@ -59,7 +59,7 @@ public class Server implements CCNFilterListener{
     public void start(){
         // All we have to do is say that we're listening on our main prefix.
         try{
-            _handle.registerFilter(ContentName.fromURI(Protocol.POST_PREFIX), this);
+            _handle.registerFilter(ContentName.fromURI(Protocol.LIGHT_POST_PREFIX), this);
         }
         catch(MalformedContentNameStringException ex){
             ex.printStackTrace();
@@ -70,11 +70,11 @@ public class Server implements CCNFilterListener{
     }
 
     private MsgItem getMsgItem(Interest interest){
-        String strMsg = interest.name().toURIString().substring(Protocol.POST_PREFIX.length());
+        String strMsg = interest.name().toURIString().substring(Protocol.LIGHT_POST_PREFIX.length());
         int splitIndex = strMsg.indexOf("/");
         String usr = strMsg.substring(0, splitIndex);
         String msg = strMsg.substring(splitIndex + 1, strMsg.length());
-        String strPub = Protocol.PUB_PREFIX + usr;
+        String strPub = Protocol.LIGHT_PUB_PREFIX + usr;
         return new MsgItem(strPub, msg);
     }
 
@@ -122,7 +122,7 @@ public class Server implements CCNFilterListener{
     public void shutdown() throws IOException {
         if (null != _handle) {
             try{
-                _handle.unregisterFilter(ContentName.fromURI(Protocol.POST_PREFIX), this);
+                _handle.unregisterFilter(ContentName.fromURI(Protocol.LIGHT_POST_PREFIX), this);
                 System.out.println("CCNQueryListener Closed!\n");
             }
             catch(MalformedContentNameStringException ex){
@@ -133,7 +133,7 @@ public class Server implements CCNFilterListener{
 
 
     public static void main(String args[]){
-        Server server = new Server();
+        LightServer server = new LightServer();
         server.start();
     }
 

@@ -29,7 +29,7 @@ import org.ccnx.ccn.protocol.MalformedContentNameStringException;
 import org.ccnx.ccn.utils.CommonSecurity;
 
 
-public class Subscriber {
+public class LSSubscriber {
 
     private CCNHandle _handle = null;   
     private String _name = null;
@@ -37,7 +37,7 @@ public class Subscriber {
     private LinkedBlockingQueue<MsgItem> _lbq = null;
     private ArrayList<SubscribeThread> _threadList = null;
 
-    public Subscriber(String name, CCNHandle handle){
+    public LSSubscriber(String name, CCNHandle handle){
         this._handle = handle;
         this._name = name;
         this._subSet = new HashSet<String>();
@@ -58,7 +58,7 @@ public class Subscriber {
     }
 
     //this should be blocking
-    public MsgItem receive(){
+    public String receive(){
         MsgItem msgItem = null;
         try{
             msgItem = _lbq.take();
@@ -67,8 +67,9 @@ public class Subscriber {
             ex.printStackTrace();
 
         }
-        return msgItem;
+        return msgItem.getPublisher() + ": " + msgItem.getMsg();
     }
+
 
     //this is non-blocking, post is done by a separate thread
     public void post(String msg){
@@ -80,10 +81,10 @@ public class Subscriber {
 
     public static void main(String argv[]){
         try{
-            Subscriber subscriber = new Subscriber("Bob", CCNHandle.open());
+            LSSubscriber subscriber = new LSSubscriber("Bob", CCNHandle.open());
             subscriber.subscribe("Alice");
             while(true){
-                System.out.println(subscriber.receive().getMsg());
+                System.out.println(subscriber.receive());
             }
         }
         catch(ConfigurationException ex){
