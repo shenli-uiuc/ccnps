@@ -56,6 +56,7 @@ public class Publisher{
         try{
             //Interest interest = new Interest(prefix);
             //_writer.addOutstandingInterest(interest);
+            Thread.sleep(1000);
             _writer.put(ContentName.fromURI(prefix), msg, Protocol.MSG_TTL);
         }
         catch(SignatureException ex){
@@ -67,6 +68,10 @@ public class Publisher{
             return false;
         }
         catch(IOException ex){
+            ex.printStackTrace();
+            return false;
+        }
+        catch(InterruptedException ex){
             ex.printStackTrace();
             return false;
         }

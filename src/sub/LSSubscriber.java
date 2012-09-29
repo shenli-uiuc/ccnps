@@ -37,6 +37,7 @@ public class LSSubscriber {
     private HashSet<String> _subSet = null;
     private LinkedBlockingQueue<MsgItem> _lbq = null;
     private ArrayList<SubscribeThread> _threadList = null;
+    private StrValidator _strValidator = null;
 
     public LSSubscriber(String name, CCNHandle handle){
         this._handle = handle;
@@ -44,6 +45,7 @@ public class LSSubscriber {
         this._subSet = new HashSet<String>();
         this._lbq = new LinkedBlockingQueue<MsgItem>();
         this._threadList = new ArrayList<SubscribeThread>();
+        this._strValidator = new StrValidator();
     } 
 
     public synchronized boolean subscribe(String name){
@@ -68,13 +70,13 @@ public class LSSubscriber {
             ex.printStackTrace();
 
         }
-        return msgItem.getPublisher() + ": " + msgItem.getMsg();
+        return msgItem.getPublisher() + ": " + _strValidator.fromValid(msgItem.getMsg());
     }
 
 
     //this is non-blocking, post is done by a separate thread
     public void post(String msg){
-        PostThread pt = new PostThread(Protocol.LIGHT_POST_PREFIX + _name, msg, _handle);
+        PostThread pt = new PostThread(Protocol.LIGHT_POST_PREFIX + _name, _strValidator.toValid(msg), _handle);
         pt.start();
     }
 

@@ -39,6 +39,7 @@ public class HSSubscriber {
     private ArrayList<SubscribeThread> _threadList = null;
     private CCNReader _subReader = null;
     private CCNReader _recReader = null;
+    private StrValidator _strValidator = null;
 
     public HSSubscriber(String name, CCNHandle handle){
         this._handle = handle;
@@ -46,6 +47,8 @@ public class HSSubscriber {
         this._subSet = new HashSet<String>();
         this._lbq = new LinkedBlockingQueue<MsgItem>();
         this._threadList = new ArrayList<SubscribeThread>();
+        this._strValidator = new StrValidator();        
+
         try{
             this._subReader = new CCNReader(this._handle);
             this._recReader = new CCNReader(this._handle);
@@ -73,7 +76,7 @@ public class HSSubscriber {
             ContentObject co = _subReader.get(interest, 20000);
             if(null == co){
                 System.out.println("Subscribe interest time out. The HSServer is not responding!");
-                return false
+                return false;
             }
             String ans = new String(co.content());
             System.out.println("Got data In subscribe : " + ans);
@@ -101,7 +104,7 @@ public class HSSubscriber {
                 ContentObject co = _recReader.get(interest, 5000); 
                 if(null == co)
                     continue;
-                return new String(co.content());   
+                return _strValidator.fromValid(new String(co.content()));   
             }
         }
         catch(MalformedContentNameStringException ex){
@@ -119,7 +122,7 @@ public class HSSubscriber {
 
     //this is non-blocking, post is done by a separate thread
     public void post(String msg){
-        PostThread pt = new PostThread(Protocol.HEAVY_POST_PREFIX + _name, msg, _handle);
+        PostThread pt = new PostThread(Protocol.HEAVY_POST_PREFIX + _name, _strValidator.toValid(msg), _handle);
         pt.start();
     }
 

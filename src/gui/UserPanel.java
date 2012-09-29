@@ -64,6 +64,7 @@ public class UserPanel extends JPanel{
     private JTable _subStatTable = null;
     private DefaultTableModel _tableModel = null;
     private String [][] _subStatData = null;
+    private int _curFolloweeCnt = 0;
 
     private LSSubscriber _lsSub = null;
     private HSSubscriber _hsSub = null;
@@ -83,6 +84,13 @@ public class UserPanel extends JPanel{
             ex.printStackTrace();
         }
         initGUI();
+    }
+
+    private void addFollowee(String followee){
+        String [] newRow = new String[TABLE_ROW_NUM];
+        newRow[0] = followee;
+        _tableModel.insertRow(0, newRow);  
+        _tableModel.fireTableDataChanged();  
     }
 
     public void initGUI(){
@@ -195,6 +203,7 @@ public class UserPanel extends JPanel{
         this.repaint();
     }
 
+
     class FollowButtonListener implements ActionListener{
 
         public void actionPerformed(ActionEvent e){
@@ -211,6 +220,7 @@ public class UserPanel extends JPanel{
             }
             _lsSub.subscribe(followee);
             _hsSub.subscribe(followee);
+            addFollowee(followee);
         }
     }
 
@@ -240,6 +250,11 @@ public class UserPanel extends JPanel{
                         "The message connat be empty", "Info", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
+            else if(null == _lsSub || null == _hsSub){
+                JOptionPane.showMessageDialog(null,
+                        "The follower has not started yet", "Info", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
             _lsSub.post(msg);
             _hsSub.post(msg);
         }
@@ -250,7 +265,7 @@ public class UserPanel extends JPanel{
             String msg = null;
             while(true){
                 msg = _lsSub.receive();
-                _lsJTextArea.append(msg);
+                _lsJTextArea.append(msg + "\n");
             }
         }
     }
