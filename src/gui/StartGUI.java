@@ -7,7 +7,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.lang.Math;
 
-public class StartPanel{
+public class StartGUI{
     public static final int EDGE_WIDTH = 2;
     public static final int HEAD_HEIGHT = 30;
 

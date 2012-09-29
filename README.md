@@ -10,4 +10,7 @@ Links
 -----
 * [CCNx](http://www.ccnx.org)
 * [CCNx on GitHub](https://github.com/ProjectCCNx)
+
+Author
+------
 * [Shen Li](http://www.cs.illinois.edu/homes/shenli3)

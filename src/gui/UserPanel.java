@@ -11,10 +11,14 @@ import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
 
+import java.io.IOException;
+
 import org.ccnx.ccn.CCNHandle;
+import org.ccnx.ccn.config.ConfigurationException;
+
 
 public class UserPanel extends JPanel{
-    public static final int HEIGHT = 600;
+    public static final int HEIGHT = 595;
     public static final int WIDTH = 200;
     public static final int TEXTAREA_WIDTH = 190;
     public static final int TEXTAREA_HEIGHT = 180;
@@ -68,8 +72,16 @@ public class UserPanel extends JPanel{
     private HSRecThread _hsRec = null;
 
     public UserPanel(){
-        //TODO
-        _lsHandle = CCNHandle.open();
+        try{
+            _lsHandle = CCNHandle.open();
+            _hsHandle = CCNHandle.open();
+        }
+        catch(ConfigurationException ex){
+            ex.printStackTrace();
+        }
+        catch(IOException ex){
+            ex.printStackTrace();
+        }
         initGUI();
     }
 
@@ -121,14 +133,14 @@ public class UserPanel extends JPanel{
         _nameButton.setFont(new Font(BUTTON_FONT, Font.PLAIN, FONT_SIZE));
         _subButton.setFont(new Font(BUTTON_FONT, Font.PLAIN, FONT_SIZE));
 
-        _nameLabel.setBounds(H_SPACE, V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 0 * (V_SPACE + LABEL_HEIGHT),
+        _nameLabel.setBounds(H_SPACE, V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
                 CONTROL_LABEL_WIDTH, LABEL_HEIGHT);
-        _subLabel.setBounds(H_SPACE, V_SPACE +  2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
+        _subLabel.setBounds(H_SPACE, V_SPACE +  2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 2 * (V_SPACE + LABEL_HEIGHT),
                 CONTROL_LABEL_WIDTH, LABEL_HEIGHT);
 
         _msgField.setBounds(H_SPACE, 
                 V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 0 * (V_SPACE + LABEL_HEIGHT),
-                CONTROL_TEXT_WIDTH + CONTROL_LABEL_WIDTH + HSPACE, CONTROL_LABEL_HEIGHT);
+                CONTROL_TEXT_WIDTH + CONTROL_LABEL_WIDTH, LABEL_HEIGHT);
         _nameField.setBounds(H_SPACE + CONTROL_LABEL_WIDTH, 
                 V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
                 CONTROL_TEXT_WIDTH, CONTROL_TEXT_HEIGHT);
@@ -165,7 +177,7 @@ public class UserPanel extends JPanel{
         }
 
         _subStatPanel.setBounds(H_SPACE, 
-                V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 2 * (V_SPACE + LABEL_HEIGHT),
+                V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 3 * (V_SPACE + LABEL_HEIGHT),
                 STAT_WIDTH, STAT_HEIGHT);
 
         this.add(_nameLabel);
@@ -210,8 +222,8 @@ public class UserPanel extends JPanel{
                         "The user name connat be empty", "Info", JOptionPane.INFORMATION_MESSAGE);
                 return;
             }
-            _lsSub = new LSSubscriber(name);
-            _hsSub = new HSSubscriber(name);
+            _lsSub = new LSSubscriber(name, _lsHandle);
+            _hsSub = new HSSubscriber(name, _hsHandle);
             _lsRec = new LSRecThread();
             _hsRec = new HSRecThread();
 
