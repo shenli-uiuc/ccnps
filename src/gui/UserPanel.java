@@ -275,7 +275,7 @@ public class UserPanel extends JPanel{
             String msg = null;
             while(true){
                 msg = _hsSub.receive();
-                _hsJTextArea.append(msg);
+                _hsJTextArea.append(msg + "\n");
             }
         }
     }

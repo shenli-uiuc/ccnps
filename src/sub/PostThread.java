@@ -42,7 +42,11 @@ public class PostThread extends Thread{
             Interest interest = new Interest(contentName);
             System.out.println("**************" + contentName.toURIString());
             CCNReader reader = new CCNReader(_handle);
-            ContentObject co = reader.get(interest, Protocol.ONEDAY);
+            ContentObject co = reader.get(interest, 20000);
+            if(null == co){
+                System.out.println("Post interest timed out, server is not responding!");
+                return Protocol.TIME_OUT;
+            }
             String ans = new String(co.content());
             System.out.println("In Post - Got data : " + ans);
             return ans;

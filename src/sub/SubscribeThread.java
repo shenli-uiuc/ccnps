@@ -62,7 +62,7 @@ public class SubscribeThread extends Thread{
                 ex.printStackTrace();
             }
             try{
-                Thread.sleep(1000);
+                Thread.sleep(1500);
             }
             catch(Exception ex){
                 ex.printStackTrace();

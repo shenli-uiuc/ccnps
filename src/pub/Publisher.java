@@ -51,7 +51,7 @@ public class Publisher{
         }
     }
 
-    public boolean publish(String prefix, String msg){
+    public synchronized boolean publish(String prefix, String msg){
 
         try{
             //Interest interest = new Interest(prefix);

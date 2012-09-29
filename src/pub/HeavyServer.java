@@ -97,13 +97,30 @@ public class HeavyServer implements CCNFilterListener{
             return Protocol.PUB_NOT_EXIST;
         }
         else{
+            PropagatePostThread ppt = new PropagatePostThread(subSet, publisher, msg);
+            ppt.start();
+            return Protocol.SUCCESS;
+        }
+    }
+
+    class PropagatePostThread extends Thread{
+        private HashSet<String> _subSet = null;
+        private String _publisher = null;
+        private String _msg = null;
+
+        public PropagatePostThread(HashSet<String> subSet, String publisher, String msg){
+            this._subSet = subSet;
+            this._publisher = publisher;
+            this._msg = msg;
+        }
+
+        public void run(){
             String sub = null;
-            Iterator it = subSet.iterator(); 
+            Iterator it = _subSet.iterator();
             while(it.hasNext()){
                 sub = (String)it.next();
-                _pub.publish(Protocol.HEAVY_PUB_PREFIX + sub, publisher + ": " + msg);
+                _pub.publish(Protocol.HEAVY_PUB_PREFIX + sub, _publisher + ": " + _msg);
             }
-            return Protocol.SUCCESS;
         }
     }
 

@@ -16,6 +16,7 @@ public class Protocol{
     public static final String PUB_NOT_EXIST = "publisher is not exist";
     public static final String SUB_ALREADY = "already subscribed";
     public static final String SERVICE_NOT_EXIST = "The requested service does not exist";
+    public static final String TIME_OUT = "Time out";
 
     public static final int ONEDAY = 1000 * 60 * 60 * 24;
     public static final Integer MSG_TTL = 1;
