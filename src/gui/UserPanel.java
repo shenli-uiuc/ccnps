@@ -14,7 +14,7 @@ import java.awt.event.*;
 import org.ccnx.ccn.CCNHandle;
 
 public class UserPanel extends JPanel{
-    public static final int HEIGHT = 570;
+    public static final int HEIGHT = 600;
     public static final int WIDTH = 200;
     public static final int TEXTAREA_WIDTH = 190;
     public static final int TEXTAREA_HEIGHT = 180;
@@ -45,12 +45,14 @@ public class UserPanel extends JPanel{
     private Label _lsLabel = null;
     private Label _hsLabel = null;
 
+    private TextField _msgField = null;
     private TextField _nameField = null;
     private TextField _subField = null;
 
     private Label _nameLabel = null;
     private Label _subLabel = null;
 
+    private JButton _msgButton = null;
     private JButton _nameButton = null;
     private JButton _subButton = null;
 
@@ -107,34 +109,44 @@ public class UserPanel extends JPanel{
         _nameLabel = new Label("Name");
         _subLabel = new Label("Follow");
 
+        _msgField = new TextField();
         _nameField = new TextField();
         _subField = new TextField();
 
+        _msgButton = new JButton("T");
         _nameButton = new JButton("S");
         _subButton = new JButton("F");
 
+        _msgButton.setFont(new Font(BUTTON_FONT, Font.PLAIN, FONT_SIZE));
         _nameButton.setFont(new Font(BUTTON_FONT, Font.PLAIN, FONT_SIZE));
         _subButton.setFont(new Font(BUTTON_FONT, Font.PLAIN, FONT_SIZE));
 
-        _nameLabel.setBounds(H_SPACE, V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 0 * (V_SPACE + LABEL_HEIGHT), 
+        _nameLabel.setBounds(H_SPACE, V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 0 * (V_SPACE + LABEL_HEIGHT),
                 CONTROL_LABEL_WIDTH, LABEL_HEIGHT);
         _subLabel.setBounds(H_SPACE, V_SPACE +  2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
                 CONTROL_LABEL_WIDTH, LABEL_HEIGHT);
 
-        _nameField.setBounds(H_SPACE + CONTROL_LABEL_WIDTH, 
+        _msgField.setBounds(H_SPACE, 
                 V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 0 * (V_SPACE + LABEL_HEIGHT),
+                CONTROL_TEXT_WIDTH + CONTROL_LABEL_WIDTH + HSPACE, CONTROL_LABEL_HEIGHT);
+        _nameField.setBounds(H_SPACE + CONTROL_LABEL_WIDTH, 
+                V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
                 CONTROL_TEXT_WIDTH, CONTROL_TEXT_HEIGHT);
         _subField.setBounds(H_SPACE + CONTROL_LABEL_WIDTH,
-                V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
+                V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 2 * (V_SPACE + LABEL_HEIGHT),
                 CONTROL_TEXT_WIDTH, CONTROL_TEXT_HEIGHT);
 
-        _nameButton.setBounds(H_SPACE + CONTROL_LABEL_WIDTH + CONTROL_TEXT_WIDTH + H_SPACE,
+        _msgButton.setBounds(H_SPACE + CONTROL_LABEL_WIDTH + CONTROL_TEXT_WIDTH + H_SPACE,
                 V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 0 * (V_SPACE + LABEL_HEIGHT),
                 BUTTON_WIDTH, BUTTON_HEIGHT);
-        _subButton.setBounds(H_SPACE + CONTROL_LABEL_WIDTH + CONTROL_TEXT_WIDTH + H_SPACE,
+        _nameButton.setBounds(H_SPACE + CONTROL_LABEL_WIDTH + CONTROL_TEXT_WIDTH + H_SPACE,
                 V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
                 BUTTON_WIDTH, BUTTON_HEIGHT);
+        _subButton.setBounds(H_SPACE + CONTROL_LABEL_WIDTH + CONTROL_TEXT_WIDTH + H_SPACE,
+                V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 2 * (V_SPACE + LABEL_HEIGHT),
+                BUTTON_WIDTH, BUTTON_HEIGHT);
 
+        _msgButton.addActionListener(new MsgButtonListener());
         _nameButton.addActionListener(new StartButtonListener());
         _subButton.addActionListener(new FollowButtonListener());
 
@@ -158,8 +170,10 @@ public class UserPanel extends JPanel{
 
         this.add(_nameLabel);
         this.add(_subLabel);
+        this.add(_msgField);
         this.add(_nameField);
         this.add(_subField);
+        this.add(_msgButton);
         this.add(_nameButton);
         this.add(_subButton);
         this.add(_subStatPanel);
@@ -203,6 +217,19 @@ public class UserPanel extends JPanel{
 
             _lsRec.start();
             _hsRec.start();
+        }
+    }
+
+    class MsgButtonListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            String msg = _msgField.getText();
+            if(null == msg || msg.equals("")){
+                JOptionPane.showMessageDialog(null,
+                        "The message connat be empty", "Info", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            _lsSub.post(msg);
+            _hsSub.post(msg);
         }
     }
 
