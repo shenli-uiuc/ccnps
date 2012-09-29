@@ -1,10 +1,17 @@
 package ccnps.gui;
 
+import ccnps.sub.*;
+import ccnps.pub.*;
+import ccnps.protocol.*;
+import ccnps.util.*;
+
 import javax.swing.*;
 import javax.swing.table.*;
 import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
+
+import org.ccnx.ccn.CCNHandle;
 
 public class UserPanel extends JPanel{
     public static final int HEIGHT = 570;
@@ -26,6 +33,8 @@ public class UserPanel extends JPanel{
     public static final int TABLE_ROW_NUM = 5;
     public static final int TABLE_COL_NUM = 1;
 
+    private CCNHandle _lsHandle = null;
+    private CCNHandle _hsHandle = null;
 
     private JScrollPane _lsJScroll = null;
     private JScrollPane _hsJScroll = null;
@@ -50,7 +59,15 @@ public class UserPanel extends JPanel{
     private DefaultTableModel _tableModel = null;
     private String [][] _subStatData = null;
 
+    private LSSubscriber _lsSub = null;
+    private HSSubscriber _hsSub = null;
+
+    private LSRecThread _lsRec = null;
+    private HSRecThread _hsRec = null;
+
     public UserPanel(){
+        //TODO
+        _lsHandle = CCNHandle.open();
         initGUI();
     }
 
@@ -118,6 +135,9 @@ public class UserPanel extends JPanel{
                 V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
                 BUTTON_WIDTH, BUTTON_HEIGHT);
 
+        _nameButton.addActionListener(new StartButtonListener());
+        _subButton.addActionListener(new FollowButtonListener());
+
         //init following table
         _subStatTable = new JTable();
         _subStatPanel = new JScrollPane(_subStatTable);
@@ -147,6 +167,63 @@ public class UserPanel extends JPanel{
         this.setBorder(new LineBorder(Color.WHITE, 2, true));
 
         this.repaint();
+    }
+
+    class FollowButtonListener implements ActionListener{
+
+        public void actionPerformed(ActionEvent e){
+            String followee = _subField.getText();
+            if(null == followee || followee.equals("")){
+                JOptionPane.showMessageDialog(null,
+                        "The followee name connat be empty", "Info", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            else if(null == _lsSub || null == _hsSub){
+                JOptionPane.showMessageDialog(null,
+                        "The follower has not started yet", "Info", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            _lsSub.subscribe(followee);
+            _hsSub.subscribe(followee);
+        }
+    }
+
+    class StartButtonListener implements ActionListener{
+        public void actionPerformed(ActionEvent e){
+            String name = _nameField.getText();
+            if(null == name || name.equals("")){
+                JOptionPane.showMessageDialog(null, 
+                        "The user name connat be empty", "Info", JOptionPane.INFORMATION_MESSAGE);
+                return;
+            }
+            _lsSub = new LSSubscriber(name);
+            _hsSub = new HSSubscriber(name);
+            _lsRec = new LSRecThread();
+            _hsRec = new HSRecThread();
+
+            _lsRec.start();
+            _hsRec.start();
+        }
+    }
+
+    class LSRecThread extends Thread{
+        public void run(){
+            String msg = null;
+            while(true){
+                msg = _lsSub.receive();
+                _lsJTextArea.append(msg);
+            }
+        }
+    }
+
+    class HSRecThread extends Thread{
+        public void run(){
+            String msg = null;
+            while(true){
+                msg = _hsSub.receive();
+                _hsJTextArea.append(msg);
+            }
+        }
     }
 
     public static void main(String args[]){
