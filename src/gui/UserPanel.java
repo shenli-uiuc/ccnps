@@ -2,22 +2,30 @@ package ccnps.gui;
 
 import javax.swing.*;
 import javax.swing.table.*;
+import javax.swing.border.*;
 import java.awt.*;
 import java.awt.event.*;
 
 public class UserPanel extends JPanel{
-    public static final int HEIGHT = 500;
+    public static final int HEIGHT = 570;
     public static final int WIDTH = 200;
-    public static final int TEXTAREA_WIDTH = 180;
+    public static final int TEXTAREA_WIDTH = 190;
     public static final int TEXTAREA_HEIGHT = 180;
-    public static final int LABEL_HEIGHT = 15;
+    public static final int LABEL_HEIGHT = 20;
     public static final int CONTROL_LABEL_WIDTH = 50;
     public static final int CONTROL_TEXT_WIDTH = 90;
-    public static final int CONTROL_TEXT_HEIGHT = 15;
-    public static final int BUTTON_WIDTH = 30;
-    public static final int BUTTON_HEIGHT = 15;
+    public static final int CONTROL_TEXT_HEIGHT = 20;
+    public static final int BUTTON_WIDTH = 40;
+    public static final int BUTTON_HEIGHT = 20;
+    public static final int STAT_WIDTH = 190;
+    public static final int STAT_HEIGHT = 95;
     public static final int V_SPACE = 5;
     public static final int H_SPACE = 5;
+    public static final String BUTTON_FONT = "serif";
+    public static final int FONT_SIZE = 9;
+    public static final int TABLE_ROW_NUM = 5;
+    public static final int TABLE_COL_NUM = 1;
+
 
     private JScrollPane _lsJScroll = null;
     private JScrollPane _hsJScroll = null;
@@ -88,6 +96,9 @@ public class UserPanel extends JPanel{
         _nameButton = new JButton("S");
         _subButton = new JButton("F");
 
+        _nameButton.setFont(new Font(BUTTON_FONT, Font.PLAIN, FONT_SIZE));
+        _subButton.setFont(new Font(BUTTON_FONT, Font.PLAIN, FONT_SIZE));
+
         _nameLabel.setBounds(H_SPACE, V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 0 * (V_SPACE + LABEL_HEIGHT), 
                 CONTROL_LABEL_WIDTH, LABEL_HEIGHT);
         _subLabel.setBounds(H_SPACE, V_SPACE +  2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
@@ -100,14 +111,30 @@ public class UserPanel extends JPanel{
                 V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
                 CONTROL_TEXT_WIDTH, CONTROL_TEXT_HEIGHT);
 
-        _nameButton.setBounds(H_SPACE + CONTROL_LABEL_WIDTH + CONTROL_TEXT_WIDTH,
+        _nameButton.setBounds(H_SPACE + CONTROL_LABEL_WIDTH + CONTROL_TEXT_WIDTH + H_SPACE,
                 V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 0 * (V_SPACE + LABEL_HEIGHT),
                 BUTTON_WIDTH, BUTTON_HEIGHT);
-        _subButton.setBounds(H_SPACE + CONTROL_LABEL_WIDTH + CONTROL_TEXT_WIDTH,
+        _subButton.setBounds(H_SPACE + CONTROL_LABEL_WIDTH + CONTROL_TEXT_WIDTH + H_SPACE,
                 V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
                 BUTTON_WIDTH, BUTTON_HEIGHT);
 
         //init following table
+        _subStatTable = new JTable();
+        _subStatPanel = new JScrollPane(_subStatTable);
+        _tableModel = new DefaultTableModel();
+
+        _subStatTable.setModel(_tableModel);
+        _tableModel.addColumn("Following");
+
+        _subStatData = new String[TABLE_ROW_NUM][TABLE_COL_NUM];
+        String [] emptyRow = new String[TABLE_COL_NUM]; 
+        for(int i = 0 ; i < TABLE_ROW_NUM; ++i){
+            _tableModel.addRow(emptyRow);
+        }
+
+        _subStatPanel.setBounds(H_SPACE, 
+                V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 2 * (V_SPACE + LABEL_HEIGHT),
+                STAT_WIDTH, STAT_HEIGHT);
 
         this.add(_nameLabel);
         this.add(_subLabel);
@@ -115,6 +142,9 @@ public class UserPanel extends JPanel{
         this.add(_subField);
         this.add(_nameButton);
         this.add(_subButton);
+        this.add(_subStatPanel);
+
+        this.setBorder(new LineBorder(Color.WHITE, 2, true));
 
         this.repaint();
     }
