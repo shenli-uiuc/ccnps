@@ -7,21 +7,24 @@ import java.awt.event.*;
 
 public class UserPanel extends JPanel{
     public static final int HEIGHT = 500;
-    public static final int WIDTH = 150;
-    public static final int TEXTAREA_WIDTH = 140;
-    public static final int TEXTAREA_HEIGHT = 140;
+    public static final int WIDTH = 200;
+    public static final int TEXTAREA_WIDTH = 180;
+    public static final int TEXTAREA_HEIGHT = 180;
     public static final int LABEL_HEIGHT = 15;
-    public static final int CONTROL_LABEL_WIDTH = 30;
-    public static final int CONTROL_TEXT_WIDTH = 80;
+    public static final int CONTROL_LABEL_WIDTH = 50;
+    public static final int CONTROL_TEXT_WIDTH = 90;
     public static final int CONTROL_TEXT_HEIGHT = 15;
     public static final int BUTTON_WIDTH = 30;
     public static final int BUTTON_HEIGHT = 15;
     public static final int V_SPACE = 5;
     public static final int H_SPACE = 5;
 
-    private TextArea _lsTextArea = null;
-    private TextArea _hsTextArea = null;
+    private JScrollPane _lsJScroll = null;
+    private JScrollPane _hsJScroll = null;
 
+    private JTextArea _lsJTextArea = null;
+    private JTextArea _hsJTextArea = null;
+    
     private Label _lsLabel = null;
     private Label _hsLabel = null;
 
@@ -47,14 +50,12 @@ public class UserPanel extends JPanel{
         this.setLayout(null);
         this.setPreferredSize(new Dimension(WIDTH, HEIGHT));
 
-        //init TextAreas
-        _lsTextArea = new TextArea();
-        _hsTextArea = new TextArea();
+        //init JTextAreas
+        _lsJTextArea = new JTextArea(TEXTAREA_WIDTH, TEXTAREA_HEIGHT);
+        _hsJTextArea = new JTextArea(TEXTAREA_WIDTH, TEXTAREA_HEIGHT);
 
-        _lsTextArea.setBounds(H_SPACE,  
-                V_SPACE + LABEL_HEIGHT + 0 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE), TEXTAREA_WIDTH, TEXTAREA_HEIGHT);
-        _hsTextArea.setBounds(H_SPACE,  
-                V_SPACE + LABEL_HEIGHT + 1 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE), TEXTAREA_WIDTH, TEXTAREA_HEIGHT);          
+        _lsJTextArea.setLineWrap(true);
+        _hsJTextArea.setLineWrap(true);
 
         _lsLabel = new Label("Light Server Response:");
         _hsLabel = new Label("Heavy Server Response:");
@@ -62,20 +63,30 @@ public class UserPanel extends JPanel{
         _lsLabel.setBounds(H_SPACE, V_SPACE + 0 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE), TEXTAREA_WIDTH, LABEL_HEIGHT);
         _hsLabel.setBounds(H_SPACE, V_SPACE + 1 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE), TEXTAREA_WIDTH, LABEL_HEIGHT);
 
-        this.add(_lsTextArea);
-        this.add(_hsTextArea);
+        _lsJScroll = new JScrollPane(_lsJTextArea);
+        _hsJScroll = new JScrollPane(_hsJTextArea);
+
+        _lsJScroll.setBounds(H_SPACE,
+                V_SPACE + LABEL_HEIGHT + 0 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE), 
+                TEXTAREA_WIDTH, TEXTAREA_HEIGHT);
+        _hsJScroll.setBounds(H_SPACE,
+                V_SPACE + LABEL_HEIGHT + 1 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE)
+                , TEXTAREA_WIDTH, TEXTAREA_HEIGHT);
+
+        this.add(_lsJScroll);
+        this.add(_hsJScroll);
         this.add(_lsLabel);
         this.add(_hsLabel);
 
         //init control items
         _nameLabel = new Label("Name");
-        _subLabel = new Label("subscribe");
+        _subLabel = new Label("Follow");
 
         _nameField = new TextField();
         _subField = new TextField();
 
-        _nameButton = new JButton();
-        _subButton = new JButton();
+        _nameButton = new JButton("S");
+        _subButton = new JButton("F");
 
         _nameLabel.setBounds(H_SPACE, V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 0 * (V_SPACE + LABEL_HEIGHT), 
                 CONTROL_LABEL_WIDTH, LABEL_HEIGHT);
@@ -95,6 +106,8 @@ public class UserPanel extends JPanel{
         _subButton.setBounds(H_SPACE + CONTROL_LABEL_WIDTH + CONTROL_TEXT_WIDTH,
                 V_SPACE + 2 * (LABEL_HEIGHT + TEXTAREA_HEIGHT + V_SPACE) + 1 * (V_SPACE + LABEL_HEIGHT),
                 BUTTON_WIDTH, BUTTON_HEIGHT);
+
+        //init following table
 
         this.add(_nameLabel);
         this.add(_subLabel);
