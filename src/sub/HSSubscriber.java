@@ -70,7 +70,11 @@ public class HSSubscriber {
             Interest interest = new Interest(contentName);
             System.out.println("**************" + contentName.toURIString());
             //every receive waits for only 5 seconds, cause we gonna need to stop this thread in the middle of execution
-            ContentObject co = _subReader.get(interest, 5000);
+            ContentObject co = _subReader.get(interest, 20000);
+            if(null == co){
+                System.out.println("Subscribe interest time out. The HSServer is not responding!");
+                return false
+            }
             String ans = new String(co.content());
             System.out.println("Got data In subscribe : " + ans);
             if(ans.equals(Protocol.SUCCESS))
